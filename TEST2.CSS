@@ -243,7 +243,7 @@ header {
 
 
 .image p {
-    font-size: 10px;
+    font-size: 15px;
     margin-right: 100 px;
     margin-left: 20px;
 }
@@ -268,7 +268,7 @@ header {
 
 
 .imaga p {
-    font-size: 10px;
+    font-size: 15px;
     margin-right: 20 px;
     margin-left: 20px;
 }
@@ -276,12 +276,12 @@ header {
 .image-align-right {
     float: right; /* Aligner l'image à droite */
     width: 250px;
-    height: auto; /* Ajuster la hauteur automatiquement */
+    height: 4335px; /* Ajuster la hauteur automatiquement */
     object-fit: cover; /* Redimensionner l'image pour couvrir toute la zone */}
 .image-align-left {
     float: left; /* Aligner l'image à droite */
     width: 250px;
-    height: 4240px; /* Ajuster la hauteur automatiquement */
+    height: 4335px; /* Ajuster la hauteur automatiquement */
     object-fit: cover; /* Redimensionner l'image pour couvrir toute la zone */
 } 
 
