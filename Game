@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Journey of Nikki</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lora', serif;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    body.dark-theme {
+      background-color: #0b0b0b;
+      color: #fff;
+    }
+
+    body.light-theme {
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    #game-container {
+      max-width: 800px;
+      width: 100%;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      background-color: var(--background);
+      box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    body.dark-theme #game-container {
+      --background: #1e1e1e;
+    }
+
+    body.light-theme #game-container {
+      --background: #fff;
+    }
+
+    h1 {
+      color: #e91e63;
+      text-shadow: 0 0 8px #e91e63;
+    }
+
+    .passage {
+      font-size: 18px;
+      padding: 10px;
+    }
+
+    .choice {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .choice button {
+      background: #333;
+      color: #e91e63;
+      padding: 12px;
+      margin: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .choice button:hover {
+      background-color: #e91e63;
+      color: #fff;
+    }
+
+    .question {
+      margin-top: 20px;
+    }
+
+    .question button {
+      background: #555;
+      color: #fff;
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .question button:hover {
+      background-color: #e91e63;
+    }
+
+    #score {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #e91e63;
+    }
+
+    #theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #e91e63;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    #theme-toggle:hover {
+      background-color: #c2185b;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <button id="theme-toggle">Switch Theme</button>
+  <div id="game-container">
+    <h1>The Journey of Nikki</h1>
+    <div id="story" class="passage"></div>
+    <div id="choices" class="choice"></div>
+    <div id="questions" class="question"></div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+    // Game state
+    let currentState = "start";
+    let score = 0;
+
+    // Questions révisables
+    const questions = {
+      haveAbortion: {
+        question: "In which year was abortion legalized in France?",
+        answers: ["1975", "1981", "1990", "2000"],
+        correct: 0
+      },
+      continuePregnancy: {
+        question: "What is the average cost of raising a child until adulthood in France?",
+        answers: ["€100,000", "€200,000", "€300,000", "€400,000"],
+        correct: 1
+      },
+      seekHelp: {
+        question: "What percentage of women in France have access to free contraceptive methods?",
+        answers: ["50%", "75%", "90%", "100%"],
+        correct: 3
+      },
+      makeItWork: {
+        question: "What is the French government's policy on financial support for single parents?",
+        answers: ["No support", "Partial support", "Full support", "Support only for married couples"],
+        correct: 1
+      },
+      askForHelp: {
+        question: "What is the name of the French law that provides financial aid to families with children?",
+        answers: ["CAF", "RSA", "APL", "CMU"],
+        correct: 0
+      },
+      relieved: {
+        question: "What is the psychological term for the feeling of relief after making a difficult decision?",
+        answers: ["Euphoria", "Catharsis", "Nostalgia", "Anxiety"],
+        correct: 1
+      },
+      guilty: {
+        question: "What is the psychological term for the feeling of guilt after making a difficult decision?",
+        answers: ["Remorse", "Regret", "Shame", "Angst"],
+        correct: 0
+      },
+      askFamily: {
+        question: "What is the role of extended family in providing emotional support in France?",
+        answers: ["Minimal", "Moderate", "Significant", "None"],
+        correct: 2
+      },
+      askFriends: {
+        question: "What is the average age at which French women have their first child?",
+        answers: ["25", "28", "32", "35"],
+        correct: 1
+      }
+    };
+
+    // Function to display story and choices
+    function displayStory(state) {
+      const storyDiv = document.getElementById("story");
+      const choicesDiv = document.getElementById("choices");
+      const questionsDiv = document.getElementById("questions");
+      storyDiv.innerHTML = "";
+      choicesDiv.innerHTML = "";
+      questionsDiv.innerHTML = "";
+
+      switch (state) {
+        case "start":
+          storyDiv.innerHTML = `
+            You are Nikki, a young woman facing a difficult decision. 
+            You and your boyfriend Sid are not ready to have a child. 
+            You have three options:
+          `;
+          addChoice("Continue the pregnancy", "continuePregnancy");
+          addChoice("Have an abortion", "haveAbortion");
+          addChoice("Seek more help", "seekHelp");
+          break;
+
+        case "continuePregnancy":
+          storyDiv.innerHTML = `
+            You decide to continue the pregnancy. 
+            You and Sid are now parents. 
+            How will you manage financially?
+          `;
+          addChoice("We will find a way to make it work", "makeItWork");
+          addChoice("We will ask for help from family and friends", "askForHelp");
+          break;
+
+        case "haveAbortion":
+          storyDiv.innerHTML = `
+            You decide to have an abortion. 
+            How do you feel about this decision?
+          `;
+          addChoice("I feel relieved", "relieved");
+          addChoice("I feel guilty", "guilty");
+          break;
+
+        case "seekHelp":
+          storyDiv.innerHTML = `
+            You decide to seek more help. 
+            Who will you ask for help?
+          `;
+          addChoice("Ask family", "askFamily");
+          addChoice("Ask friends", "askFriends");
+          break;
+
+        case "makeItWork":
+          storyDiv.innerHTML = `
+            You and Sid work hard to provide for your child. 
+            Life is tough, but you manage to make it work.
+          `;
+          displayQuestion(questions.makeItWork);
+          addChoice("Ending 1: You and your child grow together, facing challenges but finding happiness.", "restart");
+          break;
+
+        case "askForHelp":
+          storyDiv.innerHTML = `
+            You and Sid ask for help from family and friends. 
+            They support you, and you manage to raise your child together.
+          `;
+          displayQuestion(questions.askForHelp);
+          addChoice("Ending 2: With support, you and your child build a happy life.", "restart");
+          break;
+
+        case "relieved":
+          storyDiv.innerHTML = `
+            You feel relieved. 
+            This decision allows you to focus on your future and goals.
+          `;
+          displayQuestion(questions.relieved);
+          addChoice("Ending 3: You move forward with a sense of relief and hope.", "restart");
+          break;
+
+        case "guilty":
+          storyDiv.innerHTML = `
+            You feel guilty. 
+            This decision weighs heavily on your mind, but you know it was the best choice for you.
+          `;
+          displayQuestion(questions.guilty);
+          addChoice("Ending 4: You carry the weight of your decision but find peace over time.", "restart");
+          break;
+
+        case "askFamily":
+          storyDiv.innerHTML = `
+            You ask your family for help. 
+            They support you and help you make the best decision for your future.
+          `;
+          displayQuestion(questions.askFamily);
+          addChoice("Ending 5: With family support, you find a way forward.", "restart");
+          break;
+
+        case "askFriends":
+          storyDiv.innerHTML = `
+            You ask your friends for help. 
+            They provide emotional and practical support, helping you make the best decision.
+          `;
+          displayQuestion(questions.askFriends);
+          addChoice("Ending 6: With friends by your side, you find strength and clarity.", "restart");
+          break;
+
+        case "restart":
+          storyDiv.innerHTML = `
+            Thank you for playing "The Journey of Nikki"! 
+            Your final score is: <strong>${score}</strong>.
+            Would you like to play again?
+          `;
+          addChoice("Restart", "start");
+          break;
+      }
+    }
+
+    // Function to add a choice
+    function addChoice(text, nextState) {
+      const button = document.createElement("button");
+      button.textContent = text;
+      button.onclick = () => {
+        currentState = nextState;
+        displayStory(currentState);
+      };
+      document.getElementById("choices").appendChild(button);
+    }
+
+    // Function to display a question
+    function displayQuestion(question) {
+      const questionsDiv = document.getElementById("questions");
+      const questionText = document.createElement("p");
+      questionText.textContent = question.question;
+      questionsDiv.appendChild(questionText);
+
+      question.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.textContent = answer;
+        button.onclick = () => {
+          if (index === question.correct) {
+            alert("Correct!");
+            score += 1;
+          } else {
+            alert("Incorrect.");
+          }
+          document.getElementById("questions").innerHTML = "";
+        };
+        questionsDiv.appendChild(button);
+      });
+    }
+
+    // Start the game
+    displayStory(currentState);
+
+    // Theme toggle
+    const themeToggle = document.getElementById("theme-toggle");
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-theme");
+      document.body.classList.toggle("light-theme");
+    });
+  </script>
+</body>
+</html>
